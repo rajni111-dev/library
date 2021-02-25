@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: librarycm
+data:
+  bookinventory.endpoint: bookinventoryservice:9002
+  

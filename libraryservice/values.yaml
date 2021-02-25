@@ -1,0 +1,23 @@
+deployment:
+ containers:
+         image: us.icr.io/rajni/libraryservice:1.0
+         name: libraryservice
+         ports:
+           containerPort: 9001
+         env:
+             name: bookinventory.endpoint
+            
+service:
+ apiVersion: v1
+ kind: Service
+ metadata:
+   name: libraryservice
+ spec:
+   type: NodePort
+   selector:
+     app: libraryservice
+   ports:
+       protocol: TCP
+       nodePort: 30081
+       port: 9442
+       targetPort: 9001
