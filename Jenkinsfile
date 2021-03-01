@@ -12,7 +12,7 @@ pipeline {
 
             // Get some code from a GitHub repository
 
-            git 'https://github.ibm.com/Rajni-Rajput/library1.git'
+           // git 'https://github.ibm.com/Rajni-Rajput/library1.git'
 
 
             // Run Maven on a Unix agent.
@@ -22,11 +22,41 @@ pipeline {
 
             // To run Maven on a Windows agent, use
 
-             bat "clean install -DskipTests=True"
+             bat "mvn -Dmaven.test.failure.ignore=true clean package"
 
          }
+         stage('Building image') {
+      steps{
+        script {
+          dockerImage = docker.build registry + ":$BUILD_NUMBER"
+        }
+      }
+    }
+    stage('Deploy Image') {
+      steps{
+         script {
+            docker.withRegistry( '', registryCredential ) {
+            dockerImage.push()
+            }    
+          }
+        }
+      }
+  /*  stage('Remove Unused docker image') {
+      steps{
+        sh "docker rmi $registry:$BUILD_NUMBER"
+      }
+    } */
+    stage('Run Helm') {
+      steps {
+      script {      
+      container('helm') {
+        sh "helm ls"
+       }
+      } 
+      }
 
-
+  
+        
          post {
 
             // If Maven was able to run the tests, even if some of the test
